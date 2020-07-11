@@ -7,6 +7,9 @@ log_file: 'log.log'
 markets:
  bitflyer: false
  bitflyerFX: true
- bitbank: true       
- coincheck: false  
+ bitbank: true
+ coincheck: true
  zaif: false
+
+diff: 2000
+
