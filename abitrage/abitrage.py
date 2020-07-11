@@ -5,12 +5,20 @@ import datetime
 import csv
 import pprint
 import numpy as np
+import yaml
+import os
 
 def main():
 
+    with open('config.yml', 'r') as yml:
+        config = yaml.load(yml)
+
+
     # ログフォルダ・ログファイル設定
-    path = r'C:\Users\softbank\Documents\log.log'
- 
+    # path = r'C:\Users\softbank\Documents\log.log'
+    path = config['log_path']
+    file = config['log_file']
+
     init = False
 
     diff = 1000
@@ -24,11 +32,24 @@ def main():
         dt_now = datetime.datetime.now()
         logging = "timestamp", dt_now.strftime('%Y') +"/"+ dt_now.strftime('%m') +"/"+ dt_now.strftime('%d') +" "+ dt_now.strftime('%H') +":"+ dt_now.strftime('%M') +":"+ dt_now.strftime('%S')
 
-        #markets[0]  = bitflyer()       
-        markets[0]  = bitflyerFX()       
-        markets[1]  = bitbank()       
-        #markets[3]  = coincheck()       
-        #markets[4]  = zaif()
+
+        n = 0
+        for i in config['markets']:
+            if (i == "bitflyer")&(config['markets'][i]):
+                markets[n]  = bitflyer()       
+                n = n + 1
+            elif (i == "bitflyerFX")&(config['markets'][i]):
+                    markets[n]  = bitflyerFX()       
+                    n = n + 1
+            elif (i == "bitbank")&(config['markets'][i]):
+                markets[n]  = bitbank()       
+                n = n + 1
+            elif (i == "coincheck")&(config['markets'][i]):
+                markets[n]  = coincheck()       
+                n = n + 1
+            elif (i == "zaif")&(config['markets'][i]):
+                markets[n]  = zaif()
+                n = n + 1
 
         print("===============================================")
         print(dt_now,'\n')
@@ -42,19 +63,18 @@ def main():
 
             init = True
 
-        for i in markets:
+        for i in range(markets.__len__()):
             ASK_Corp = markets[i]['Corp']
             ASK_Prise = markets[i]['Data']['ASKS']['Price']
 
-            for j in markets:
+            for j in range(markets.__len__()):
                 BID_Corp = markets[j]['Corp']
                 BID_Prise = markets[j]['Data']['BIDS']['Price']
                 
 
 
-
-                stackA[i][j].append(float(BID_Prise)-float(ASK_Prise))
-                stackB[i][j].append(float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price']))
+                stackA[i][j].append(int(BID_Prise)-int(ASK_Prise))
+                stackB[i][j].append(int(markets[i]['Data']['BIDS']['Price']) - int(markets[j]['Data']['ASKS']['Price']))
 
 
                 if (stackA[i][j].__len__() >= 330)|(stackA[i][j][0] == 99999999):
@@ -71,7 +91,7 @@ def main():
 
                 
                 if ASK_Corp != BID_Corp:
-                    if float(BID_Prise) - float(ASK_Prise) > diff :
+                    if int(BID_Prise) - int(ASK_Prise) > diff :
                         print('[アビトラ発動]')
                         print('ASK',ASK_Corp,ASK_Prise)
                         print('BID',BID_Corp,BID_Prise)
@@ -85,7 +105,8 @@ def main():
 
         print(logging)
 
-        with open(path, mode='a') as f:
+        os.makedirs(path, exist_ok=True)
+        with open(path + file, mode='a') as f:
             f.write(str(logging)+ '\n') 
 
 

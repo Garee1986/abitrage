@@ -1,0 +1,12 @@
+version: 1
+
+log_path: 'C:\Users\shini\OneDrive\ƒhƒLƒ…ƒƒ“ƒg\abitrage\'
+#log_path: 'C:\Users\softbank\Documents\'
+log_file: 'log.log'
+
+markets:
+ bitflyer: false
+ bitflyerFX: true
+ bitbank: true       
+ coincheck: false  
+ zaif: false
