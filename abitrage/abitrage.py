@@ -21,7 +21,8 @@ def main():
 
     init = False
 
-    abtr_json = {} 
+    ApiFunction.coincheckMountCheck(config['API']['coincheck'])
+
 
     while True:
         markets = {}
@@ -34,25 +35,23 @@ def main():
         n = 0
         for i in config['markets']:
             if (i == "bitflyer")&(config['markets'][i]):
-                markets[n]  = ApiFunction.bitflyer()       
+                markets[n]  = ApiFunction.bitflyerRateCheck()       
                 n = n + 1
             elif (i == "bitflyerFX")&(config['markets'][i]):
-                    markets[n]  = ApiFunction.bitflyerFX()       
+                    markets[n]  = ApiFunction.bitflyerFXRateCheck()       
                     n = n + 1
             elif (i == "bitbank")&(config['markets'][i]):
-                markets[n]  = ApiFunction.bitbank()       
+                markets[n]  = ApiFunction.bitbankRateCheck()       
                 n = n + 1
             elif (i == "coincheck")&(config['markets'][i]):
-                markets[n]  = ApiFunction.coincheck()       
+                markets[n]  = ApiFunction.coincheckRateCheck()       
                 n = n + 1
             elif (i == "zaif")&(config['markets'][i]):
-                markets[n]  = ApiFunction.zaif()
+                markets[n]  = ApiFunction.zaifRateCheck()
                 n = n + 1
 
         print("===============================================")
-        print(dt_now,'\n')
-
-        # print(markets)
+        print(dt_now)
 
         if init == False:
             stackA = [[[99999999 for k in range(1)] for j in markets] for i in markets]
@@ -63,16 +62,16 @@ def main():
 
         for i in range(markets.__len__()):
             ASK_Corp = markets[i]['Corp']
-            ASK_Prise = markets[i]['Data']['ASKS']['Price']
+            ASK_Prise = int(float(markets[i]['Data']['ASKS']['Price']))
 
             for j in range(markets.__len__()):
                 BID_Corp = markets[j]['Corp']
-                BID_Prise = markets[j]['Data']['BIDS']['Price']
+                BID_Prise = int(float(markets[j]['Data']['BIDS']['Price']))
                 
 
 
-                stackA[i][j].append(float(BID_Prise)-float(ASK_Prise))
-                stackB[i][j].append(float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price']))
+                stackA[i][j].append(int(float(BID_Prise)-float(ASK_Prise)))
+                stackB[i][j].append(int(float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price'])))
 
 
                 if (stackA[i][j].__len__() >= 330)|(stackA[i][j][0] == 99999999):
@@ -90,18 +89,17 @@ def main():
                 
                 if ASK_Corp != BID_Corp:
                     if float(BID_Prise) - float(ASK_Prise) > config['diff'] :
-                        print('[アビトラ発動]')
+                        print('===============================================')
                         print('ASK',ASK_Corp,ASK_Prise)
                         print('BID',BID_Corp,BID_Prise)
-                        print('ASK_' + ASK_Corp,'-BID_' + BID_Corp,':', "現在値" ,float(BID_Prise)-float(ASK_Prise), "最大値" ,int(stackAmax), "平均値" ,int(stackAave) )
-                        print('ASK_' + BID_Corp,'-BID_' + ASK_Corp,':', "現在値" ,float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price']), "最大値" ,int(stackBmin), "平均値" ,int(stackBave) )
-                        print('\n')
+                        print('ASK_' + ASK_Corp,'-BID_' + BID_Corp,':', "現在値" ,int(float(BID_Prise)-float(ASK_Prise)), "最大値" ,int(stackAmax), "平均値" ,int(stackAave) )
+                        print('ASK_' + BID_Corp,'-BID_' + ASK_Corp,':', "現在値" ,int(float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price'])), "最大値" ,int(stackBmin), "平均値" ,int(stackBave) )
 
                         logging += 'ASKS_' + ASK_Corp , float(BID_Prise)
-                        logging += 'ASKS_' + ASK_Corp + '-BIDS_' + BID_Corp , float(BID_Prise) - float(ASK_Prise) , stackAmax , stackAave
-                        logging += 'ASKS_' + BID_Corp + '-BIDS_' + ASK_Corp , float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price']) , stackBmin , stackBave
+                        logging += 'ASKS_' + ASK_Corp + '-BIDS_' + BID_Corp , int(float(BID_Prise) - float(ASK_Prise)) , stackAmax , stackAave
+                        logging += 'ASKS_' + BID_Corp + '-BIDS_' + ASK_Corp , int(float(markets[i]['Data']['BIDS']['Price']) - float(markets[j]['Data']['ASKS']['Price'])) , stackBmin , stackBave
 
-        print(logging)
+        print("\n",logging,"\n")
 
         os.makedirs(path, exist_ok=True)
         with open(path + file, mode='a') as f:

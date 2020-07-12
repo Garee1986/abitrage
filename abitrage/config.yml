@@ -13,3 +13,8 @@ markets:
 
 diff: 2000
 
+API:
+ coincheck:
+  key: "HC5Acvo1aqAJam-Q"
+  secret: "AQT_xjcT1UVpqYfTQvBCR00PNM97WyNA"
+

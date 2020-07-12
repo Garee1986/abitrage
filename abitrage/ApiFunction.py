@@ -1,8 +1,10 @@
 import urllib.request
 import json
+import pybitflyer
+from coincheck.coincheck import CoinCheck
+import logging
 
-
-def bitbank():
+def bitbankRateCheck():
 
     url = 'https://public.bitbank.cc/btc_jpy/depth'
 
@@ -32,11 +34,14 @@ def bitbank():
                         }
                 }
 
+    else:
+        dict = {}
+
     return dict
 
 
 
-def bitflyer():
+def bitflyerRateCheck():
 
     url = 'https://api.bitflyer.com/v1/board'
 
@@ -66,8 +71,8 @@ def bitflyer():
     return dict
 
 
+def bitflyerFXRateCheck():
 
-def bitflyerFX():
 
     url = 'https://api.bitflyer.com/v1/board?product_code=FX_BTC_JPY'
 
@@ -79,6 +84,7 @@ def bitflyerFX():
     except urllib.error.URLError as e:
         print(e.reason)
         body = ""
+        print(body)
 
 
     if body != "":
@@ -93,12 +99,14 @@ def bitflyerFX():
                          "Size":body['bids'][0]['size']}
                      }
                 }
+    else:
+        dict = {}
 
     return dict
 
 
 
-def coincheck():
+def coincheckRateCheck():
 
     url = 'https://coincheck.com/api/order_books'
 
@@ -129,7 +137,17 @@ def coincheck():
 
 
 
-def zaif():
+def coincheckMountCheck(account):
+    params = {}
+
+    coinCheck = CoinCheck(account["key"], account["secret"])
+
+    res = json.loads(coinCheck.account.balance(params));
+    print("JPY:",res['jpy'],"BTC:",res['btc'])
+
+
+
+def zaifRateCheck():
 
     url = 'https://api.zaif.jp/api/1/depth/btc_jpy'
 
